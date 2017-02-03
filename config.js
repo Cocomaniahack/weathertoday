@@ -1,6 +1,6 @@
 'use strict'
 var r = process.env.API_WEATHER_KEY
-console.log('other key in env.sh '+r) 
+
 var config = {
   
   aws: {

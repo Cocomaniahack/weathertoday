@@ -39,16 +39,13 @@ $( "#target" ).on('submit', function( event ) {
   
     event.preventDefault(); 
     var dato = jQuery( "input:first" ).val()
-    console.log('cant '+dato.length)
+    
 
 
     if(dato.length < 3){
 
 
     }else{
-
-
-
         $('#spiner').removeClass('hide')
         var tipo = "2"
         Storage(dato,tipo)
@@ -72,14 +69,14 @@ function dataLocation(){
 
    if(localStorage.key(0)){
 
-     console.log('por localStorage')
+     
      var latitude  = localStorage.getItem('latitude')
      var longitude = localStorage.getItem('longitude')
      var t = {coords: {'latitude': latitude, 'longitude': longitude  }}
      getCurrent(t)
     
   }else{
-     console.log('por navigator')
+     
      navigator.geolocation.getCurrentPosition(getCurrent, Error)
 
   }
@@ -438,7 +435,7 @@ module.exports = data
 (function (process){
 'use strict'
 var r = process.env.API_WEATHER_KEY
-console.log('other key in env.sh '+r) 
+
 var config = {
   
   aws: {
