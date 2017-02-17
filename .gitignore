@@ -14,3 +14,9 @@ translate
 env.sh
 changeTe.js
 public/button.js
+autocomplete
+cities
+lib
+rethinkdb_data
+.babelrc
+Gulpfile.js
