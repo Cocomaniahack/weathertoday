@@ -175,10 +175,10 @@ module.exports = function select(dato) {
     var string = dato.charAt(0).toUpperCase() + dato.slice(1);
 
     $.ajax({
-      type: 'GET',
+      type: 'post',
       async: true,
       data: 'id=' + string,
-      url: '/lib/index.js',
+      url: '/cities',
       success: function success(response) {
         autocomplet(response);
       }
@@ -258,21 +258,18 @@ module.exports = function bt() {
 (function (process){
 'use strict';
 
-var r = process.env.API_WEATHER_KEY;
-
 var config = {
 
   aws: {
 
-    accessKey: process.env.API_WEATHER_KEY || "76cd7ff9f4b72ba8655a21ddc5a1a2bd",
-    accessKeyTime: process.env.API_TIME_KEY || "G8CRY6MRJHJQ"
+    accessKey: process.env.API_WEATHER_KEY || "76cd7ff9f4b72ba8655a21ddc5a1a2bd"
+    //accessKeyTime: process.env.API_TIME_KEY || "G8CRY6MRJHJQ"
     //"76cd7ff9f4b72ba8655a21ddc5a1a2bd"
 
   }
 
 };
 
-// console.log('adasd '+JSON.stringify(process))
 module.exports = config;
 
 }).call(this,require('_process'))
@@ -17569,13 +17566,22 @@ var weatherCity = require('./weather.js');
 var cities = [];
 module.exports = function localstorage(position, tipo) {
 
-  //  console.log('storage '+position.coords.latitude)
-
-
   if (tipo == '1') {
 
     localStorage.setItem('latitude', position.coords.latitude);
     localStorage.setItem('longitude', position.coords.longitude);
+    var data = "lat=" + position.coords.latitude + "&lon=" + position.coords.longitude;
+
+    $.ajax({
+      type: 'post',
+      async: true,
+      data: data,
+      url: '/location',
+      success: function success(data) {
+        console.log(data);
+      }
+
+    });
   } else if (tipo == '2') {
 
     if (localStorage.getItem("cities")) {
@@ -17590,26 +17596,11 @@ module.exports = function localstorage(position, tipo) {
   } else if (tipo == '3' && localStorage.length >= 3) {
 
     var citi = JSON.parse(localStorage.getItem('cities'));
-    //$('#spiner').removeClass('hide')
-    console.log('old ' + citi);
 
     citi.forEach(function (oldData) {
 
       weatherCity(oldData);
     });
-
-    //function render(datas){
-
-
-    //}
-    //    var i;
-    //    for (i = 0; i < localStorage.length; i++)   {
-    //      var oldData =   localStorage.getItem(localStorage.key(i))
-    //      weatherCity(oldData)
-    //      console.log('old localStorage '+oldData)
-
-    // }
-
   }
 };
 
@@ -17769,53 +17760,14 @@ var template = require('./template');
 var buttons = require('./public/button.js');
 
 var API_KEY = config.aws.accessKey;
-var API_KEY_TIME = config.aws.accessKeyTime;
 
 var API_WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather?APPID=" + API_KEY + "&";
-//var API_ZONETIME  = "http://api.timezonedb.com/v2/list-time-zone?key="+API_KEY_TIME+"&"
-//var API_ZONETIME ="http://api.timezonedb.com/v2/list-time-zone?key=G8CRY6MRJHJQ&format=json&"
-
 
 module.exports = function weatherCity(city) {
 
   $.getJSON(API_WEATHER_URL + "q=" + city, newCity);
 
   function newCity(data) {
-
-    // $.getJSON(API_ZONETIME +"country="+data.sys.country, newHour)
-
-
-    // function newHour(time, err){
-    //   // data.timeZone = time.zones[0].timestamp
-    //   console.log('time '+JSON.stringify(err))
-    //    if(err !== 'success'){ 
-
-
-    //      var theDate = new Date().getTime()
-    //      console.log('no se encontro la hora ')
-
-    //    }else{
-    //     console.log('Si se encontro la hora ')
-    //      var theDate = new Date(time.zones[0].timestamp * 1000);
-
-
-    //    }
-
-    //    var hora = theDate.getHours();
-    //    var minutes = theDate.getMinutes()
-
-
-    //    if(minutes < 9){
-
-
-    //      var timeZone = hora+':0'+minutes
-
-    //    }else{
-
-    //      var timeZone = hora+':'+minutes
-
-    //    }
-
 
     jQuery('#main-weather-city').append('<div class="newClass" style="border-top: 1px solid white;">' + '<row>' + '<div class="col-xs-11 col-sm-11 col-md-11"><h2 style="padding-left: 15px;">' + data.sys.country + '. ' + data.name + '. </h2></div>' + '</row>' + '<div class="col-xs-1 col-sm-1 col-md-1" style="margin-top: 15px"><i class="fa fa-times fa-2x delete' + data.id + '" id="' + city + '" aria-hidden="true"></i></div>' + '<div class="col-xs-1 col-sm-1 col-md-1" style="margin-top: 15px"><i class="fa fa-2x fa-refresh update-c' + data.id + '" id="' + city + '"  aria-hidden="true"></i></div>' + '<div id="' + data.id + '">' + template(data) + '</div>' + '</div>');
     buttons.update(data.id);
