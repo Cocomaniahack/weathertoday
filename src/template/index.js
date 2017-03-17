@@ -61,7 +61,12 @@ icons(iconID)
 
 
    function cent(temperatura){
-  
+   
+     if(isNaN(temperatura)){
+
+       return '---'
+
+     }
       var centInit = temperatura - parseInt(273.15) 
       var result   = parseFloat(centInit).toFixed(1)
 

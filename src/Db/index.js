@@ -1,14 +1,13 @@
+"use strict"
+
 var Promise = require("bluebird");
 var r = require('rethinkdb')
 var co = require('co');
-require("babel-polyfill");
 
-
-
- const defaults = {
+const defaults = {
   "host": 'localhost',
   "port": 28015,
-  "db": "location"
+  "db": "weatherDb"
  }
 
 
@@ -24,11 +23,11 @@ class Db {
        }
 
        
-
+ //---------------------------------------------------------------------------------------
 
      coneccion (callback){
         
-
+      
 
         this.connection = r.connect({
             host: this.host,
@@ -36,32 +35,25 @@ class Db {
             db:   this.db
       
          })
+         
+         this.connecte = true
 
-       
-        this.connecte = true
+         var db = this.db
 
-        var coneccion = this.connection
+         var coneccion = this.connection
 
-         var setups = co.wrap(function * () {
-             var conn = yield coneccion
-
-             var base  = yield r.dbList().run(conn)
-             if(base.indexOf('location') === -1) {
-                  yield r.dbCreate('location').run(conn)
-             }else{
-                 console.log('ya existe')
-             }
-
-             return conn
-
-         })
-
-
-         return Promise.resolve(setups()).asCallback(callback)
+         return Promise.resolve(coneccion).asCallback(callback)
 
       }
-
+ //---------------------------------------------------------------------------------------
       disconnect (callback){
+
+        if(!this.connecte){
+          
+         return Promise.reject(new Error('not connected')).asCallback(callback)
+        }
+
+        this.connecte = false
 
         var connection = this.connection
 
@@ -79,47 +71,97 @@ class Db {
          })
 
      }
-      
-      selectCities(name, callback){
-       //  console.log('1 '+connection)
+     //---------------------------------------------------------------------------------------
+
+     firstConeccion (callback){
 
         var connection = this.connection
-
+        var db = this.db
         var setup = co.wrap(function * () {
        
-               var conn = yield connection
+             var conn = yield connection
+             
+             var base  = yield r.dbList().run(conn)
+             if(base.indexOf(db) === -1) {
+                  yield r.dbCreate(db).run(conn)
+             }
 
-               var citi = yield r.db('location').table('cities').filter(function(doc){
+             var tablaCiti = yield r.db(db).tableList().run(conn)
+             if(tablaCiti.indexOf('cities') === -1){
+                  yield r.db(db).tableCreate('cities').run(conn)
+                 
+             }
+
+             if(tablaCiti.indexOf('coords') === -1){
+               yield r.db(db).tableCreate('coords').run(conn)
+             }
+
+            return conn
+
+        })
+
+        return Promise.resolve(setup()).asCallback(callback)
+
+
+     }
+      
+ //---------------------------------------------------------------------------------------
+     //  selectCities(name, callback){
+     
+       
+     //   if(this.connecte == false){
+     //     console.log('error de coneccion')
+     //    // return Promise.reject(new Error('not connected')).asCallback(callback)
+     //   }else{
+
+        
+
+
+     //    var connection = this.connection
+     //    var db = this.db
+     //    var setup = co.wrap(function * () {
+       
+     //           var conn = yield connection
+              
+            
+     //           var citi = yield r.db(db).table('cities').filter(function(doc){
                         
 
-                        return  doc('name').match("^"+name+"")
+     //                    return  doc('name').match("^"+name+"")
 
 
-                }).distinct().limit(10).run(conn, callback);
+     //            }).distinct().limit(10).run(conn, callback);
 
-               if(citi.errors > 0){
+     //           // if(citi.errors > 0){
+                  
+     //           //    return Promise.reject(new Error(citi.first_error))
+     //           // }
 
-                  return Promise.reject(new Error(citi.first_error))
-               }
-  
-               var resss = yield citi.toArray(function(index, result) {
 
-                   return result
-                 })
+     //           var resss = yield citi.toArray(function(index, result) {
 
-              return resss
-        })
+     //               return result
+
+     //             })
+
+     //          return resss
+
+             
+     //    })
+     //  }
      
-        return Promise.resolve(setup()).asCallback(callback)
+     //    return Promise.resolve(setup()).asCallback(callback)
    
 
        
-     }
+     // }
 
+ //---------------------------------------------------------------------------------------
 
-      insertLocation(location){
+      insertLocation(location, callback){
 
           var connection = this.connection
+          var db = this.db
 
           var insert = co.wrap(function * () {
 
@@ -127,14 +169,41 @@ class Db {
             
              location.createAt = new Date()
 
-             var inLocation = yield r.db('location').table('coords').insert([location]).run(conn)
+             var inLocation = yield r.db(db).table('coords').insert([location]).run(conn)
 
               return inLocation
           })
 
-         return Promise.resolve(insert())
+         return Promise.resolve(insert()).asCallback(callback)
 
      
+
+      }
+//---------------------------------------------------------------------------------------
+      selectCroods(callback){
+       
+         var connection = this.connection
+         var db = this.db
+         
+          var SelectCroods = co.wrap(function * () {
+
+              var conn = yield connection
+
+              var coords = yield r.db(db).table('coords').run(conn)
+
+              //console.log(coords)
+
+               var response = yield coords.toArray(function(index, result) {
+
+                  return result
+               }) 
+
+              return response
+             
+          })
+
+         return Promise.resolve(SelectCroods()).asCallback(callback)
+
 
       }
 

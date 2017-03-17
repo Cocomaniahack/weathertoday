@@ -12,12 +12,15 @@ var API_WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather?APPID="+AP
 
 module.exports = function weatherCity(city){
 
- $.getJSON(API_WEATHER_URL +"q="+city, newCity  )
+ $.getJSON(API_WEATHER_URL +"q="+city, newCity)
       
   
   
 
-  function newCity(data){
+  function newCity(data, err){
+
+
+       //console.log('llego '+data)
 
         jQuery('#main-weather-city').append('<div class="newClass" style="border-top: 1px solid white;">'+
                                     '<row>'+
@@ -32,7 +35,7 @@ module.exports = function weatherCity(city){
         buttons.update(data.id)
         buttons.change()
         $('#spiner').addClass('hide')
-        return data;
+        //return data;
 
    
 

@@ -1,13 +1,17 @@
 'use strict'
 
- var Db = require('./lib')
- var config = require('./configDb')
+var Db = require('./src/Db')
+var config = require('./configDb')
 
- var db = new Db(config.db)
+  var db = new Db(config.db)
+  db.coneccion()
 
 
-var coo = db.coneccion()
+
+var coo = db.firstConeccion()
 	coo.then(function(data){
-    console.log('Database setup') 
+    console.log('Database setup: '+data) 
     process.exit(0) 
 })
+
+//console.log(config)

@@ -6,6 +6,8 @@ var weatherCity = require('../weather')
 var cities =[]
 module.exports = function localstorage(position, tipo){
   
+    
+
     if (tipo == '1'){
 
 
@@ -20,14 +22,13 @@ module.exports = function localstorage(position, tipo){
          data: data,
          url: '/location',
          success: function(data){
-           console.log(data)
+           //console.log(data)
 
          }
 
 
 
       })
-
 
      }else if(tipo == '2' ){
        
@@ -37,7 +38,7 @@ module.exports = function localstorage(position, tipo){
                 cities = JSON.parse(localStorage.cities);
 
             } else {
-                console.log("cities does not exist");
+                
             }
 
             cities.push(position);
@@ -52,9 +53,31 @@ module.exports = function localstorage(position, tipo){
         
         citi.forEach(function(oldData){
 
-        weatherCity(oldData)
+           weatherCity(oldData)
 
-      })
+           //console.log(oldData)
+
+        })
+
+   }else if(tipo == '4' && localStorage.length <= 3){
+
+    
+
+     var citi = JSON.parse(localStorage.getItem('cities'))
+      
+     if(citi.length === 0){
+           localStorage.clear()
+           alert('unexpected error. please refresh the page try again later')
+     }
+     
+
+     citi.forEach(function(oldData){
+          
+           weatherCity(oldData)
+
+      
+
+        })
 
    }
 
