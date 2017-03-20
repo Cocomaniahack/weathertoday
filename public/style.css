@@ -6,6 +6,11 @@ text-decoration: underline;
  cursor: pointer;
 
 }
+.jumbotron{
+   background-image: url("img/wallpapers64.jpg");
+}
+
+ <img src='img/wallpapers64.jpg'>
 .grys{
 
   background-color: #f5f5f5;
